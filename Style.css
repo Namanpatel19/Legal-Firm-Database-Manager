@@ -1,11 +1,25 @@
 body{
    
     background-image:url(background\ image.png);
-    background-color: black;
+    background-color: black; 
 
 }
+
 h1{
-    color:rgba(255, 255, 255, 0.8)
+    color:rgba(255, 255, 255, 0.8);
+    text-transform:capitalize ;
 
     
+}
+
+#a101{
+    display:block;
+    color: black;
+    background-color: black;
+    height: 50PX;
+    
+    top:0;
+    
+
+
 }
