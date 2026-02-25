@@ -1,0 +1,19 @@
+<h2>Clients</h2>
+<form method="POST" action="/add_client">
+<input name="name" placeholder="Name" required>
+<input name="contact" placeholder="Contact">
+<input name="address" placeholder="Address">
+<input name="email" placeholder="Email">
+<button type="submit">Add</button>
+</form>
+
+<table border="1">
+<tr><th>ID</th><th>Name</th><th>Contact</th></tr>
+{% for c in clients %}
+<tr>
+<td>{{ c[0] }}</td>
+<td>{{ c[1] }}</td>
+<td>{{ c[2] }}</td>
+</tr>
+{% endfor %}
+</table>

@@ -1,0 +1,19 @@
+<h2>Hearings</h2>
+<form method="POST" action="/add_hearing">
+<input name="case_id" placeholder="Case ID" required>
+<input type="date" name="hearing_date" required>
+<input name="remarks" placeholder="Remarks">
+<input type="date" name="next_hearing_date">
+<button type="submit">Add</button>
+</form>
+
+<table border="1">
+<tr><th>ID</th><th>Case</th><th>Date</th></tr>
+{% for h in hearings %}
+<tr>
+<td>{{ h[0] }}</td>
+<td>{{ h[1] }}</td>
+<td>{{ h[2] }}</td>
+</tr>
+{% endfor %}
+</table>
