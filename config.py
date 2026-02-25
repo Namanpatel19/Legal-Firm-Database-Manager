@@ -1,11 +1,10 @@
 import os
 
 class Config:
-    SECRET_KEY = "secretkey"
-    MYSQL_HOST = "localhost"
-    MYSQL_USER = "root"
-    MYSQL_PASSWORD = "password"
-    MYSQL_DB = "law_firm"
+    SECRET_KEY = os.environ.get("SECRET_KEY", "supersecretkey")
 
-    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+    MYSQL_HOST = os.environ.get("MYSQLHOST")
+    MYSQL_PORT = int(os.environ.get("MYSQLPORT", 3306))
+    MYSQL_USER = os.environ.get("MYSQLUSER")
+    MYSQL_PASSWORD = os.environ.get("MYSQLPASSWORD")
+    MYSQL_DB = os.environ.get("MYSQLDATABASE")
