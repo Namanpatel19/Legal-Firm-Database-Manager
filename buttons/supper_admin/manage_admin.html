@@ -1,0 +1,27 @@
+<div class="overlay">
+    <div class="dashboard-card">
+        <h1>User Management</h1>
+        
+        <div class="photo-upload-wrapper">
+            <h3>Update Advocate Profile Photo</h3>
+            <img src="../assets/images/default-avatar.png" class="profile-preview" id="preview">
+            <form action="upload_photo.php" method="POST" enctype="multipart/form-data">
+                <select name="advocate_id" style="margin-bottom: 10px;">
+                    <option>Select Advocate to Update...</option>
+                </select>
+                <input type="file" name="advocate_photo" onchange="document.getElementById('preview').src = window.URL.createObjectURL(this.files[0])">
+                <button type="submit" class="btn-submit" style="width: auto; padding: 10px 30px;">Upload Photo</button>
+            </form>
+        </div>
+
+        <h3>Register System Admin</h3>
+        <form class="action-grid">
+            <input type="text" placeholder="First Name">
+            <input type="text" placeholder="Last Name">
+            <input type="email" placeholder="Admin Email">
+            <input type="password" placeholder="System Password">
+            <button class="btn-submit">Authorize Admin</button>
+        </form>
+        <a href="super_dash.html" class="back-link">← Back to Command Center</a>
+    </div>
+</div>
