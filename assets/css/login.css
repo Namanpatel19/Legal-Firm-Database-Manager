@@ -1,0 +1,24 @@
+.login-box {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 40px;
+    border-radius: 15px;
+    backdrop-filter: blur(15px);
+    width: 320px;
+}
+
+.login-box form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-box input {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+}
+
+.login-box input:focus {
+    box-shadow: 0 0 5px #d4af37;
+}

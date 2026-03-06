@@ -1,0 +1,13 @@
+@media (max-width: 768px) {
+
+    .home-box,
+    .login-box,
+    .dashboard {
+        width: 90%;
+        padding: 25px;
+    }
+
+    .dash-buttons {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,50 @@
+/* ================= RESET ================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ================= BODY ================= */
+
+body {
+    background: url("background image.png") no-repeat center center/cover;
+    height: 100vh;
+    color: #fff;
+}
+
+/* Dark overlay */
+.overlay {
+    background: rgba(0, 0, 0, 0.75);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ================= BUTTON ================= */
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #d4af37;
+    color: black;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn:hover {
+    background: white;
+    transform: scale(1.05);
+}
+
+/* ================= HEADINGS ================= */
+
+h1, h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
