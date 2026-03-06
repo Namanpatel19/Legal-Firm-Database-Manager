@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Lex Firm</title>
+    <link rel="stylesheet" href="../assets/css/admin-button.css">
+</head>
+<body>
+
+<div class="overlay">
+    <div class="dashboard-card">
+        <h1>Hearing Schedule</h1>
+        <p>Update court dates and hearing status.</p>
+        
+        <form class="form-container">
+            <div class="action-grid">
+                <select name="case_id">
+                    <option>Select Case Title</option>
+                </select>
+                <input type="date" name="hearing_date" required>
+                <input type="time" name="hearing_time">
+                <select name="status">
+                    <option>Scheduled</option>
+                    <option>Adjourned</option>
+                    <option>Completed</option>
+                </select>
+                <textarea placeholder="Court Remarks/Summary" style="grid-column: span 1;"></textarea>
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top:20px;">Update Court Diary</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
+

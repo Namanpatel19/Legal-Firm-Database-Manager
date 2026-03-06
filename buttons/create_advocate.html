@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Lex Firm</title>
+    <link rel="stylesheet" href="../assets/css/admin-button.css">
+</head>
+<body>
+<div class="overlay">
+    <div class="dashboard-card">
+        <h1>Register Advocate</h1>
+        <p>Add a new legal professional to the firm registry.</p>
+        
+        <form class="form-container" action="process_advocate.php" method="POST">
+            <div class="action-grid">
+                <input type="text" name="first_name" placeholder="First Name" required>
+                <input type="text" name="last_name" placeholder="Last Name">
+                <input type="text" name="specialization" placeholder="Specialization (e.g. Criminal, Civil)">
+                <input type="email" name="email" placeholder="Professional Email" required>
+                <input type="password" name="password" placeholder="Temporary Password" required>
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top:20px;">Confirm Registration</button>
+        </form>
+        <a href="../dashboard/admin_dashboard.html" class="btn-logout">← Back to Dashboard</a>
+    </div>
+</div>
+
+</body>
+</html>
