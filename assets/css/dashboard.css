@@ -1,14 +1,122 @@
-.dashboard {
-    background: rgba(255, 255, 255, 0.08);
-    padding: 40px;
-    border-radius: 15px;
-    backdrop-filter: blur(15px);
-    width: 600px;
-    text-align: center;
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+    --gold: #D4AF37;
+    --gold-glow: rgba(212, 175, 55, 0.3);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --text-white: #f8f9fa;
+    --text-dim: rgba(255, 255, 255, 0.6);
 }
 
-.dash-buttons {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-white);
+    background: #050505;
+}
+
+/* Background & Reactive Overlay */
+.overlay {
+    min-height: 100vh;
+    width: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+                url("../images/background_image.png") no-repeat center center/cover fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(1rem, 5vw, 4rem); /* Responsive padding */
+}
+
+/* Central Dashboard Container */
+.dashboard-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--glass-border);
+    border-radius: 2rem;
+    padding: clamp(2rem, 8vw, 5rem);
+    width: 100%;
+    max-width: 1100px;
+    text-align: center;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    transition: transform 0.5s ease;
+}
+
+/* Reactive Typography */
+.dashboard-card h1 {
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.dashboard-card p {
+    color: var(--text-dim);
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+    margin-bottom: 3.5rem;
+    font-weight: 300;
+}
+
+/* THE REACTIVE GRID */
+.action-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    /* This creates a fluid layout: it fits as many as possible until 240px wide, then stacks */
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Action Tiles (Buttons) */
+.tile {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-white);
+    padding: 2.5rem 1.5rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 1.2rem;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.05rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.tile:hover {
+    background: var(--gold);
+    color: #000;
+    border-color: var(--gold);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px var(--gold-glow);
+}
+
+/* Logout styling */
+.btn-logout {
+    margin-top: 4rem;
+    display: inline-block;
+    color: #ff5e5e;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-bottom: 1px solid transparent;
+    transition: 0.3s;
+}
+
+.btn-logout:hover {
+    border-color: #ff5e5e;
+    letter-spacing: 1px;
+}
+
+/* Small Device Adjustment */
+@media (max-width: 600px) {
+    .dashboard-card { padding: 2.5rem 1rem; }
+    .action-grid { grid-template-columns: 1fr; }
 }
