@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assignment View | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+    <style>
+        .section-card { background:rgba(255,255,255,0.03); border:1px solid rgba(212,175,55,0.2); border-radius:16px; padding:24px 28px; margin-bottom:32px; }
+        .section-title { color:#D4AF37; font-size:1rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid rgba(212,175,55,0.2); }
+        .assign-table { width:100%; border-collapse:collapse; font-size:0.87rem; }
+        .assign-table th { background:rgba(212,175,55,0.12); color:#D4AF37; padding:10px 14px; text-align:left; text-transform:uppercase; letter-spacing:0.5px; font-weight:600; border-bottom:1px solid rgba(212,175,55,0.25); }
+        .assign-table td { padding:10px 14px; color:rgba(255,255,255,0.85); border-bottom:1px solid rgba(255,255,255,0.06); }
+        .assign-table tr:hover td { background:rgba(255,255,255,0.03); }
+        .badge-pill { display:inline-block; padding:3px 12px; border-radius:20px; font-size:0.74rem; font-weight:600; }
+        .badge-blue { background:rgba(100,149,237,0.15); color:#6495ED; border:1px solid rgba(100,149,237,0.35); }
+        .search-input { width:100%; padding:11px 16px; border-radius:10px; border:1px solid rgba(212,175,55,0.3); background:rgba(255,255,255,0.06); color:#fff; font-size:0.88rem; outline:none; font-family:'Poppins',sans-serif; transition:0.3s; margin-bottom:14px; }
+        .search-input:focus { border-color:#D4AF37; }
+        .btn-unassign { background:rgba(255,77,77,0.15); border:1px solid rgba(255,77,77,0.5); color:#ff6b6b; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.78rem; transition:0.2s; }
+        .btn-unassign:hover { background:rgba(255,77,77,0.3); }
+        .empty-row td { text-align:center; color:rgba(255,255,255,0.35); padding:20px; }
+    </style>
+</head>
+<body>
+<div class="overlay">
+
+    <div class="logo" style="position:absolute;top:30px;left:60px;display:flex;align-items:center;z-index:100;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height:45px;width:auto;margin-right:15px;filter:drop-shadow(0 0 5px rgba(212,175,55,0.3));">
+        <span style="color:#D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width:1000px;">
+        <h1>Advocate → Client Assignments</h1>
+        <p style="color:rgba(255,255,255,0.5);margin-bottom:20px;">View and manage which clients are assigned to each advocate under your management.</p>
+
+        <a href="/dashboard/admin" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.75);padding:7px 16px;border-radius:20px;font-size:0.82rem;text-decoration:none;margin-bottom:22px;transition:0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">← Back to Dashboard</a>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div style="color:#fff;background:{% if category=='error' %}rgba(255,77,77,0.18){% else %}rgba(77,255,77,0.18){% endif %};border:1px solid {% if category=='error' %}#ff4d4d{% else %}#4dff4d{% endif %};padding:11px 16px;border-radius:10px;margin-bottom:16px;font-size:0.88rem;">{{ message }}</div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+
+        <div class="section-card">
+            <div class="section-title">My Advocate → Client Assignments</div>
+            <input class="search-input" type="text" id="searchInput" placeholder="🔍  Search by advocate or client name…" oninput="filterTable()">
+            <div style="overflow-x:auto;">
+            <table class="assign-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Advocate Name</th>
+                        <th>Specialization</th>
+                        <th>Client Name</th>
+                        <th>Client Email</th>
+                        <th>Client Phone</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for row in advocate_client_assignments %}
+                    <tr>
+                        <td style="color:rgba(255,255,255,0.4);">{{ loop.index }}</td>
+                        <td><strong>{{ row.adv_first }} {{ row.adv_last or '' }}</strong></td>
+                        <td><span class="badge-pill badge-blue">{{ row.specialization or 'General' }}</span></td>
+                        <td>{{ row.client_first }} {{ row.client_last or '' }}</td>
+                        <td style="font-size:0.8rem;color:rgba(255,255,255,0.6);">{{ row.client_email }}</td>
+                        <td style="font-size:0.8rem;color:rgba(255,255,255,0.6);">{{ row.client_phone or '—' }}</td>
+                        <td>
+                            <button class="btn-unassign" onclick="unassignAdvocateClient({{ row.advocate_id }}, {{ row.client_id }})">Unassign</button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr class="empty-row"><td colspan="7">No advocate–client assignments found for your managed advocates.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('#tableBody tr').forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+
+async function unassignAdvocateClient(advocateId, clientId) {
+    if (!confirm('Remove this client from this advocate? The client record will remain.')) return;
+    try {
+        const fd = new FormData();
+        fd.append('advocate_id', advocateId);
+        fd.append('client_id', clientId);
+        const res = await fetch('/api/unassign/advocate_client', { method:'POST', body: fd });
+        const r = await res.json();
+        if (r.success) location.reload();
+        else alert('Error: ' + (r.error || 'Unknown'));
+    } catch(e) { alert('Network error.'); }
+}
+</script>
+</body>
+</html>

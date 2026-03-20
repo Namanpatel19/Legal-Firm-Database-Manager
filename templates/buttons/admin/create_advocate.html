@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Lex Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+</head>
+<body>
+<div class="overlay">
+
+    <!-- Global Logo -->
+    <div class="logo" style="position: absolute; top: 30px; left: 60px; display: flex; align-items: center; z-index: 100; font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height: 45px; width: auto; margin-right: 15px; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));">
+        <span style="color: #D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card">
+        <h1>Register Advocate</h1>
+        <p>Add a new legal professional to the firm registry.</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div style="color: #fff; background: {% if category == 'error' %}rgba(255, 77, 77, 0.2){% else %}rgba(77, 255, 77, 0.2){% endif %}; border: 1px solid {% if category == 'error' %}#ff4d4d{% else %}#4dff4d{% endif %}; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; text-align: center;">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="photo-upload-wrapper" style="margin-bottom: 30px;">
+            <h3>Update Advocate Profile Photo</h3>
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23D4AF37'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" class="profile-preview" id="preview" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); margin: 0 auto 20px; display: block;">
+            <form action="#" method="POST" enctype="multipart/form-data">
+                <select name="advocate_id" style="margin-bottom: 10px;">
+                    <option>Select Advocate to Update...</option>
+                </select>
+                <input type="file" name="advocate_photo" onchange="document.getElementById('preview').src = window.URL.createObjectURL(this.files[0])">
+                <button type="submit" class="btn-submit" style="width: auto; padding: 10px 30px;">Upload Photo</button>
+            </form>
+        </div>
+
+        <form class="form-container" action="/admin/create_advocate" method="POST">
+            <div class="action-grid">
+                <input type="text" name="first_name" placeholder="First Name" required>
+                <input type="text" name="last_name" placeholder="Last Name">
+                <input type="text" name="specialization" placeholder="Specialization (e.g. Criminal, Civil)">
+                <input type="email" name="email" placeholder="Professional Email" required>
+                <input type="password" name="password" placeholder="Temporary Password" required>
+                <div style="display:flex; gap:10px;">
+                    <select name="phone_country_code" style="width: 120px; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; font-size: 1rem;">
+                        <option value="+91" selected>+91</option>
+                        <option value="+1">+1</option>
+                        <option value="+44">+44</option>
+                        <option value="+61">+61</option>
+                    </select>
+                    <input type="text" name="phone_number" placeholder="Primary Contact (e.g. 9876543210)" style="flex:1;" required>
+                </div>
+                <input type="text" name="phone_number_alt" placeholder="Alternate Contact (Optional)">
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top:20px;">Confirm Registration</button>
+        </form>
+        <a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
+    </div>
+</div>
+
+</body>
+</html>

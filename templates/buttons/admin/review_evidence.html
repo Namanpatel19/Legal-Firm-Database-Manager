@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Evidence Registry | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+    <style>
+        .section-title {
+            color: #D4AF37;
+            font-size: 0.93rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 30px 0 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(212,175,55,0.2);
+        }
+        .ev-type-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.73rem;
+            font-weight: 600;
+        }
+        .ev-doc  { background: rgba(0,150,255,0.15); color: #00aaff; border: 1px solid rgba(0,150,255,0.3); }
+        .ev-img  { background: rgba(0,230,118,0.12); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
+        .ev-vid  { background: rgba(212,175,55,0.15); color: #D4AF37; border: 1px solid rgba(212,175,55,0.3); }
+        .ev-aud  { background: rgba(156,39,176,0.15); color: #ce93d8; border: 1px solid rgba(156,39,176,0.3); }
+        .ev-phy  { background: rgba(255,77,77,0.12); color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); }
+
+        .upload-zone {
+            border: 2px dashed rgba(212,175,55,0.35);
+            border-radius: 14px;
+            padding: 30px 20px;
+            text-align: center;
+            background: rgba(212,175,55,0.03);
+            transition: 0.3s;
+            margin-top: 0;
+        }
+        .upload-zone:hover { border-color: #D4AF37; background: rgba(212,175,55,0.07); }
+        .upload-zone p { color: rgba(255,255,255,0.5); font-size: 0.88rem; margin-bottom: 12px; }
+        .upload-zone input[type="file"] { color: rgba(255,255,255,0.8); font-size: 0.88rem; }
+
+        .ev-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+        .ev-table th {
+            background: rgba(212,175,55,0.1);
+            color: #D4AF37;
+            padding: 11px 14px;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.77rem;
+            border-bottom: 1px solid rgba(212,175,55,0.25);
+        }
+        .ev-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.82);
+            vertical-align: middle;
+        }
+        .ev-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .file-link {
+            color: #D4AF37;
+            text-decoration: none;
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(212,175,55,0.3);
+            transition: 0.2s;
+        }
+        .file-link:hover { color: #fff; border-color: #fff; }
+        .empty-msg { text-align:center; color:rgba(255,255,255,0.3); padding:25px; font-size:0.9rem; }
+    </style>
+</head>
+<body>
+<div class="overlay" style="align-items:flex-start; padding-top:100px;">
+
+    <!-- Logo -->
+    <div class="logo" style="position:fixed;top:25px;left:50px;display:flex;align-items:center;z-index:100;font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:#fff;letter-spacing:2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height:42px;width:auto;margin-right:12px;filter:drop-shadow(0 0 5px rgba(212,175,55,0.3));">
+        <span style="color:#D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width:1050px;">
+        <h1>Evidence Registry</h1>
+        <p style="color:rgba(255,255,255,0.5);font-size:0.88rem;margin-bottom:5px;">Submit and manage all case evidence. Files are stored securely on the server.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div style="color:#fff;background:{% if category=='error' %}rgba(255,77,77,0.18){% else %}rgba(0,230,118,0.15){% endif %};border:1px solid {% if category=='error' %}#ff4d4d{% else %}#00e676{% endif %};padding:10px 16px;border-radius:8px;margin-bottom:15px;font-size:0.88rem;text-align:center;">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- ===== SUBMIT NEW EVIDENCE ===== -->
+        <h3 class="section-title">📎 Submit New Evidence</h3>
+
+        <form action="{{ form_action }}" method="POST" enctype="multipart/form-data">
+            <div class="action-grid">
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:5px;">Associated Case *</label>
+                    <select name="case_id" required>
+                        <option value="" disabled selected>— Select a Case —</option>
+                        {% for case in cases %}
+                        <option value="{{ case.case_id }}">{{ case.case_number }} | {{ case.case_title }}</option>
+                        {% else %}
+                        <option disabled>No active cases found</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:5px;">Evidence Title *</label>
+                    <input type="text" name="evidence_title" placeholder="e.g. CCTV Footage, Contract Copy" required>
+                </div>
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:5px;">Evidence Type *</label>
+                    <select name="evidence_type" required>
+                        <option value="" disabled selected>— Select Type —</option>
+                        <option value="Document">📄 Document</option>
+                        <option value="Image">🖼️ Image</option>
+                        <option value="Video">🎥 Video</option>
+                        <option value="Audio">🎵 Audio</option>
+                        <option value="Physical">📦 Physical</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:5px;">Description</label>
+                    <input type="text" name="description" placeholder="Brief description of this evidence">
+                </div>
+            </div>
+
+            <!-- File Upload Zone -->
+            <div class="upload-zone" style="margin-top:18px;">
+                <p>📂 Drag & drop or click to upload evidence file</p>
+                <input type="file" name="evidence_file" id="evidenceFile" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.mp4,.mp3,.wav">
+                <p id="chosenFile" style="margin-top:8px;color:#D4AF37;font-size:0.82rem;display:none;"></p>
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top:20px;">🔒 Submit Evidence to Registry</button>
+        </form>
+
+        <!-- ===== EVIDENCE TABLE ===== -->
+        <h3 class="section-title">📋 Evidence on Record
+            <span style="float:right;font-size:0.78rem;font-weight:400;color:rgba(255,255,255,0.4);">{{ evidences|length if evidences else 0 }} record(s)</span>
+        </h3>
+
+        {% if evidences %}
+        <div class="table-container" style="margin-top:0;">
+            <table class="ev-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Case #</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>File</th>
+                        <th>Uploaded</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in evidences %}
+                    <tr>
+                        <td><strong style="color:var(--gold);">#{{ ev.evidence_id }}</strong></td>
+                        <td>{{ ev.case_number }}</td>
+                        <td>{{ ev.evidence_title }}</td>
+                        <td>
+                            {% set t = ev.evidence_type %}
+                            <span class="ev-type-badge
+                                {% if t == 'Document' %}ev-doc
+                                {% elif t == 'Image' %}ev-img
+                                {% elif t == 'Video' %}ev-vid
+                                {% elif t == 'Audio' %}ev-aud
+                                {% else %}ev-phy{% endif %}">
+                                {{ t }}
+                            </span>
+                        </td>
+                        <td style="color:rgba(255,255,255,0.6);max-width:220px;">{{ ev.description or '—' }}</td>
+                        <td>
+                            {% if ev.file_path %}
+                            <a href="{{ url_for('static', filename='uploads/evidence/' + ev.file_path.split('/')[-1]) }}" target="_blank" class="file-link">📥 View File</a>
+                            {% else %}
+                            <span style="color:rgba(255,255,255,0.3);font-size:0.82rem;">No file</span>
+                            {% endif %}
+                        </td>
+                        <td style="color:rgba(255,255,255,0.5);font-size:0.82rem;">{{ ev.created_at.strftime('%d %b %Y') if ev.created_at else '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty-msg">No evidence on record yet. Submit the first one above.</p>
+        {% endif %}
+
+        <a href="{{ back_url if back_url else '/dashboard/admin' }}" class="back-link">← Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+document.getElementById('evidenceFile').addEventListener('change', function() {
+    const lbl = document.getElementById('chosenFile');
+    if (this.files.length > 0) {
+        lbl.textContent = '✓ Selected: ' + this.files[0].name;
+        lbl.style.display = 'block';
+    }
+});
+</script>
+</body>
+</html>

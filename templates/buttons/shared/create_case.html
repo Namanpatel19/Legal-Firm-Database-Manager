@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Case | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+</head>
+<body>
+<div class="overlay">
+
+    <div class="logo" style="position:absolute;top:30px;left:60px;display:flex;align-items:center;z-index:100;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height:45px;width:auto;margin-right:15px;filter:drop-shadow(0 0 5px rgba(212,175,55,0.3));">
+        <span style="color:#D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width: 860px;">
+        <h1>Create New Case</h1>
+        <p style="color:rgba(255,255,255,0.55); margin-bottom:20px;">Register a new legal case and link it to an existing client.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div style="color:#fff;background:{% if category=='error' %}rgba(255,77,77,0.2){% else %}rgba(77,255,77,0.2){% endif %};border:1px solid {% if category=='error' %}#ff4d4d{% else %}#4dff4d{% endif %};padding:10px;border-radius:8px;margin-bottom:14px;text-align:center;font-size:0.9rem;">{{ message }}</div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+
+        <form class="form-container" action="{{ form_action }}" method="POST">
+            <div class="action-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+
+                <!-- Client Select -->
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:6px;">Select Client *</label>
+                    <select name="client_id" required style="width:100%; background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'%23D4AF37\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E'); background-repeat:no-repeat; background-position:right 14px center; padding-right:40px;">
+                        <option value="" disabled selected>— Select Client —</option>
+                        {% for client in clients %}
+                        <option value="{{ client.client_id }}">
+                            {{ client.first_name }} {{ client.last_name or '' }}{% if client.email %} ({{ client.email }}){% endif %}
+                        </option>
+                        {% else %}
+                        <option disabled>No clients available</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Case Number -->
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:6px;">Case Number *</label>
+                    <input type="text" name="case_number" placeholder="e.g. CR-2024-001" required style="width:100%;">
+                </div>
+
+                <!-- Case Title -->
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:6px;">Case Title *</label>
+                    <input type="text" name="case_title" placeholder="e.g. State v. John Doe" required style="width:100%;">
+                </div>
+
+                <!-- Case Type -->
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:6px;">Case Type *</label>
+                    <select name="case_type" required style="width:100%; background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'%23D4AF37\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E'); background-repeat:no-repeat; background-position:right 14px center; padding-right:40px;">
+                        <option value="" disabled selected>— Select Type —</option>
+                        <option value="Civil">Civil</option>
+                        <option value="Criminal">Criminal</option>
+                        <option value="Corporate">Corporate</option>
+                        <option value="Family">Family</option>
+                        <option value="Real Estate">Real Estate</option>
+                        <option value="Intellectual Property">Intellectual Property</option>
+                        <option value="Tax">Tax</option>
+                        <option value="Labour">Labour</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+
+                <!-- Court Select -->
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:6px;">Select Court *</label>
+                    <select name="court_id" required style="width:100%; background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'%23D4AF37\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E'); background-repeat:no-repeat; background-position:right 14px center; padding-right:40px;">
+                        <option value="" disabled selected>— Select Court —</option>
+                        {% for court in courts %}
+                        <option value="{{ court.court_id }}">
+                            {{ court.court_name }} ({{ court.city }})
+                        </option>
+                        {% else %}
+                        <option disabled>No courts available</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Filing Date -->
+                <div>
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:6px;">Filing Date</label>
+                    <input type="date" name="filing_date" style="width:100%;" value="{{ today }}">
+                </div>
+
+                <!-- Description (full width) -->
+                <div style="grid-column: 1 / -1;">
+                    <label style="color:var(--gold);font-size:0.8rem;display:block;margin-bottom:6px;">Case Description</label>
+                    <textarea name="description" placeholder="Brief description of the case…" style="width:100%; min-height:90px; resize:vertical;"></textarea>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top:25px;">⚖️ Create Case</button>
+        </form>
+
+        <!-- Recent Cases Table -->
+        {% if recent_cases %}
+        <div style="margin-top:40px;">
+            <h3 style="color:var(--gold); font-family:'Playfair Display',serif; letter-spacing:1px; margin-bottom:18px; border-bottom:1px solid rgba(212,175,55,0.3); padding-bottom:8px;">
+                Recent Cases
+            </h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Case No.</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Client</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in recent_cases %}
+                        <tr>
+                            <td>{{ c.case_number }}</td>
+                            <td>{{ c.case_title }}</td>
+                            <td>{{ c.case_type }}</td>
+                            <td>{{ c.first_name }} {{ c.last_name or '' }}</td>
+                            <td>
+                                <span style="padding:3px 10px; border-radius:20px; font-size:0.78rem; font-weight:600;
+                                    background:{% if c.case_status == 'Open' %}rgba(77,255,77,0.15){% elif c.case_status == 'Closed' %}rgba(255,77,77,0.15){% else %}rgba(212,175,55,0.15){% endif %};
+                                    color:{% if c.case_status == 'Open' %}#4dff4d{% elif c.case_status == 'Closed' %}#ff4d4d{% else %}#D4AF37{% endif %};">
+                                    {{ c.case_status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <a href="{{ back_url }}" class="back-link">← Back to Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reopen Case | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+    <style>
+        .reopen-select-card { background:rgba(255,255,255,0.03); border:1px solid rgba(212,175,55,0.2); border-radius:14px; padding:22px 24px; margin-bottom:24px; }
+        .selected-preview { display:none; background:linear-gradient(90deg,rgba(40,167,69,0.08),rgba(40,167,69,0.02)); border-left:4px solid #28a745; border-radius:12px; padding:16px 20px; margin-top:16px; }
+        .selected-preview.visible { display:block; }
+        .form-section-label { color:#D4AF37; font-size:0.75rem; text-transform:uppercase; letter-spacing:1.5px; font-weight:600; display:block; margin-bottom:8px; }
+        select, input[type="date"], textarea {
+            width:100%; background:rgba(255,255,255,0.06)!important; border:1px solid rgba(255,255,255,0.1);
+            border-radius:10px; padding:12px 16px; color:#fff!important; font-family:'Poppins',sans-serif;
+            font-size:0.9rem; outline:none; transition:border-color 0.2s; box-sizing:border-box;
+        }
+        select:focus,input[type="date"]:focus,textarea:focus { border-color:rgba(212,175,55,0.5)!important; }
+        select option { background:#1a1a1a; color:#fff; }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+        @media(max-width:600px){.form-row{grid-template-columns:1fr;}}
+        .btn-reopen-case {
+            background:linear-gradient(135deg,#1e7e34,#28a745); color:#fff; border:none;
+            padding:14px 32px; border-radius:30px; font-size:0.95rem; font-weight:600;
+            font-family:'Poppins',sans-serif; cursor:pointer; letter-spacing:0.5px;
+            transition:transform 0.2s,box-shadow 0.2s; box-shadow:0 4px 15px rgba(40,167,69,0.3);
+        }
+        .btn-reopen-case:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(40,167,69,0.45); }
+        .field-group { margin-bottom:18px; }
+        textarea { resize:vertical; min-height:100px; }
+
+        /* Closed cases list below */
+        .closed-cases-section { margin-top:30px; }
+        .closed-cases-section h3 { color:#D4AF37; font-size:0.95rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(212,175,55,0.2); }
+        .case-tbl { width:100%; border-collapse:collapse; font-size:0.85rem; }
+        .case-tbl th { background:rgba(212,175,55,0.12); color:#D4AF37; padding:9px 12px; text-align:left; text-transform:uppercase; letter-spacing:0.5px; font-weight:600; border-bottom:1px solid rgba(212,175,55,0.2); }
+        .case-tbl td { padding:9px 12px; color:rgba(255,255,255,0.82); border-bottom:1px solid rgba(255,255,255,0.06); }
+        .case-tbl tr:hover td { background:rgba(255,255,255,0.03); }
+        .btn-select-case { background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.4); color:#D4AF37; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.78rem; }
+        .btn-select-case:hover { background:rgba(212,175,55,0.3); }
+    </style>
+</head>
+<body>
+<div class="overlay">
+
+    <div class="logo" style="position:absolute;top:30px;left:60px;display:flex;align-items:center;z-index:100;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height:45px;width:auto;margin-right:15px;filter:drop-shadow(0 0 5px rgba(212,175,55,0.3));">
+        <span style="color:#D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width:780px;">
+        <h1>Restore Archived Case</h1>
+        <p style="color:rgba(255,255,255,0.5);margin-bottom:24px;">Select a closed case from the archives and restore it to active status.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div style="color:#fff;background:{% if category=='error' %}rgba(255,77,77,0.18){% else %}rgba(77,255,77,0.18){% endif %};border:1px solid {% if category=='error' %}#ff4d4d{% else %}#4dff4d{% endif %};padding:12px 18px;border-radius:10px;margin-bottom:18px;font-size:0.88rem;">{{ message }}</div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+
+        <form action="{{ form_action }}" method="POST" id="reopenForm">
+            <!-- Step 1: Select Case -->
+            <div class="reopen-select-card">
+                <span class="form-section-label">Step 1 — Select Closed Case</span>
+                <select name="case_id" id="caseSelect" required onchange="previewCase(this)">
+                    <option value="" disabled selected>— Choose a closed case to restore —</option>
+                    {% for case in closed_cases %}
+                    <option value="{{ case.case_id }}"
+                            data-number="{{ case.case_number }}"
+                            data-title="{{ case.case_title }}"
+                            data-status="{{ case.case_status }}"
+                            data-client="{{ case.first_name }} {{ case.last_name or '' }}"
+                            data-closed="{{ case.closing_date.strftime('%d %b %Y') if case.closing_date else 'Unknown' }}">
+                        {{ case.case_number }} — {{ case.case_title }} ({{ case.first_name }} {{ case.last_name or '' }}) [{{ case.case_status }}]
+                    </option>
+                    {% else %}
+                    <option disabled>No closed cases available</option>
+                    {% endfor %}
+                </select>
+
+                <div class="selected-preview" id="casePreview">
+                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Selected Case</div>
+                    <div style="font-size:1.05rem;font-weight:600;color:#28a745;" id="previewTitle">—</div>
+                    <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:4px;" id="previewMeta">—</div>
+                </div>
+            </div>
+
+            <!-- Step 2: Restoration Details -->
+            <span class="form-section-label">Step 2 — Restoration Details</span>
+
+            <div class="form-row" style="margin-top:10px;">
+                <div class="field-group">
+                    <label class="form-section-label">Reason for Reopening</label>
+                    <select name="reopen_reason" required>
+                        <option value="Appeal">Appeal Filed</option>
+                        <option value="New Evidence">Discovery of New Evidence</option>
+                        <option value="Clerical Error">Administrative / Clerical Error</option>
+                        <option value="Court Order">Superior Court Order</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="form-section-label">Restoration Date</label>
+                    <input type="date" name="reopen_date" id="reopenDate" required>
+                </div>
+            </div>
+
+            <div class="field-group" style="margin-top:4px;">
+                <label class="form-section-label">Additional Justification / Remarks</label>
+                <textarea name="reopen_remarks" placeholder="Provide detailed justification for restoring this case…"></textarea>
+            </div>
+
+            <div style="margin-top:24px;padding:22px 24px;background:rgba(40,167,69,0.05);border-radius:14px;border:1px solid rgba(40,167,69,0.2);">
+                <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:16px;">⚠️ Reopening this case will move it back to <strong style="color:#28a745;">Open</strong> status. Assigned advocates will be notified.</p>
+                <button type="submit" class="btn-reopen-case" onclick="return confirm('Confirm restoration of this case to active status?')">
+                    Confirm Case Restoration
+                </button>
+            </div>
+        </form>
+
+        <!-- Closed Cases Table -->
+        <div class="closed-cases-section">
+            <h3>All Closed Cases ({{ closed_cases|length }})</h3>
+            {% if closed_cases %}
+            <div style="margin-bottom:10px;">
+                <input type="text" id="closedSearch" placeholder="🔍 Search closed cases…"
+                    oninput="filterClosedCases()"
+                    style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(212,175,55,0.3);background:rgba(255,255,255,0.06);color:#fff;font-size:0.85rem;outline:none;font-family:'Poppins',sans-serif;">
+            </div>
+            <div style="overflow-x:auto;">
+            <table class="case-tbl" id="closedTable">
+                <thead>
+                    <tr>
+                        <th>Case #</th>
+                        <th>Title</th>
+                        <th>Client</th>
+                        <th>Status</th>
+                        <th>Closed On</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="closedBody">
+                    {% for case in closed_cases %}
+                    <tr>
+                        <td><strong>{{ case.case_number }}</strong></td>
+                        <td>{{ case.case_title }}</td>
+                        <td>{{ case.first_name }} {{ case.last_name or '' }}</td>
+                        <td>
+                            {% if case.case_status == 'Closed' %}<span style="color:#aaa;">✓ Closed</span>
+                            {% elif case.case_status == 'Settled' %}<span style="color:#6495ED;">⚖ Settled</span>
+                            {% elif case.case_status == 'Dismissed' %}<span style="color:#ff9800;">✗ Dismissed</span>
+                            {% else %}<span>{{ case.case_status }}</span>{% endif %}
+                        </td>
+                        <td>{{ case.closing_date.strftime('%d %b %Y') if case.closing_date else '—' }}</td>
+                        <td>
+                            <button class="btn-select-case"
+                                onclick="selectCaseFromTable({{ case.case_id }}, '{{ case.case_number }}', '{{ case.case_title|replace("'", "\\'") }}', '{{ case.case_status }}', '{{ case.first_name }} {{ case.last_name or '' }}', '{{ case.closing_date.strftime('%d %b %Y') if case.closing_date else 'Unknown' }}')">
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            {% else %}
+            <p style="color:rgba(255,255,255,0.35);text-align:center;padding:20px;">No closed cases found in the archives.</p>
+            {% endif %}
+        </div>
+
+        <div style="margin-top:28px;">
+            <a href="{{ back_url }}" class="back-link">← Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('reopenDate').valueAsDate = new Date();
+
+function previewCase(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    if (!opt.value) return;
+    document.getElementById('previewTitle').textContent = opt.dataset.title || '—';
+    document.getElementById('previewMeta').textContent =
+        'Case: ' + (opt.dataset.number || '—') +
+        '  |  Client: ' + (opt.dataset.client || '—') +
+        '  |  Closed: ' + (opt.dataset.closed || '—') +
+        '  |  Status: ' + (opt.dataset.status || '—');
+    document.getElementById('casePreview').classList.add('visible');
+}
+
+function selectCaseFromTable(id, num, title, status, client, closed) {
+    const sel = document.getElementById('caseSelect');
+    for (let i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value == id) {
+            sel.selectedIndex = i;
+            previewCase(sel);
+            sel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            break;
+        }
+    }
+}
+
+function filterClosedCases() {
+    const q = document.getElementById('closedSearch').value.toLowerCase();
+    document.querySelectorAll('#closedBody tr').forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>

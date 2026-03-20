@@ -1,0 +1,52 @@
+/* ================= RESET ================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ================= BODY ================= */
+
+body {
+    background: url("../images/background_image.png") no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    color: #fff;
+    background-color: #0f172a; /* Fallback Slate 900 */
+}
+
+/* Dark overlay */
+.overlay {
+    background: rgba(0, 0, 0, 0.7);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ================= BUTTON ================= */
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #d4af37;
+    color: black;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn:hover {
+    background: white;
+    transform: scale(1.05);
+}
+
+/* ================= HEADINGS ================= */
+
+h1, h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Dropdown styling */
+        .role-select {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23D4AF37' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+        }
+        .role-select:focus {
+            border-color: #D4AF37;
+            background-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+        .role-select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .role-label {
+            text-align: left;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            margin-bottom: -12px;
+            letter-spacing: 0.5px;
+        }
+        .login-box h2 {
+            font-family: 'Playfair Display', serif;
+            color: #D4AF37;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .divider {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+
+        <!-- Global Logo -->
+        <div class="logo" style="position: absolute; top: 30px; left: 60px; display: flex; align-items: center; z-index: 100; font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 2px;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height: 45px; width: auto; margin-right: 15px; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));">
+            <span style="color: #D4AF37;">INS</span> FIRM
+        </div>
+
+        <div class="login-box">
+            <h2>Secure Login</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div style="color: {% if category == 'error' %}#ff4d4d{% else %}#4dff4d{% endif %}; background: {% if category == 'error' %}rgba(255, 77, 77, 0.1){% else %}rgba(77, 255, 77, 0.1){% endif %}; border: 1px solid {% if category == 'error' %}#ff4d4d{% else %}#4dff4d{% endif %}; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; text-align:center;">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('login') }}" method="POST">
+                <p class="role-label">Login As</p>
+                <select name="role" class="role-select" required>
+                    <option value="" disabled selected>— Select Role —</option>
+                    <option value="admin">Admin</option>
+                    <option value="advocate">Advocate</option>
+                    <option value="client">Client</option>
+                </select>
+                <input type="email" name="email" placeholder="Email Address" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 15px; margin-bottom: 25px;">
+                <a href="{{ url_for('forgot_password') }}" style="color: #D4AF37; font-family: 'Poppins', sans-serif; font-size: 0.9rem; text-decoration: none; transition: 0.3s; padding: 5px;">Forgot Password?</a>
+            </div>
+
+            <a href="{{ url_for('home') }}" class="back-home">← Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

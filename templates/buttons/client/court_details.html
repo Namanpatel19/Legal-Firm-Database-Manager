@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Court Details | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client-button.css') }}">
+    <style>
+        .case-court-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(212,175,55,0.05) 100%);
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 22px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .case-court-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(212,175,55,0.12);
+        }
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(212,175,55,0.15);
+        }
+        .case-badge {
+            background: rgba(212,175,55,0.12);
+            border: 1px solid rgba(212,175,55,0.35);
+            color: #D4AF37;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .status-pill {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .status-open   { background: rgba(0,230,118,0.12); color: #00e676; }
+        .status-closed { background: rgba(255,77,77,0.12);  color: #ff6b6b; }
+        .status-pending{ background: rgba(255,215,64,0.12); color: #ffd740; }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+        .info-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 14px 18px;
+        }
+        .info-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .info-value {
+            font-size: 0.95rem;
+            color: #fff;
+            font-weight: 500;
+        }
+        .hearing-banner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: linear-gradient(90deg, rgba(212,175,55,0.08), rgba(212,175,55,0.03));
+            border: 1px solid rgba(212,175,55,0.25);
+            border-left: 4px solid #D4AF37;
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-top: 12px;
+        }
+        .hearing-icon { font-size: 1.6rem; }
+        .hearing-text strong { color: #D4AF37; font-size: 0.95rem; }
+        .hearing-text small { color: rgba(255,255,255,0.5); font-size: 0.78rem; }
+        .no-court {
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 12px 18px;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.3);
+        }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+<div class="overlay">
+
+    <div class="logo" style="position:absolute;top:30px;left:60px;display:flex;align-items:center;z-index:100;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height:45px;width:auto;margin-right:15px;filter:drop-shadow(0 0 5px rgba(212,175,55,0.3));">
+        <span style="color:#D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width:920px;">
+        <h1>⚖️ Court & Hearing Details</h1>
+        <p style="color:rgba(255,255,255,0.55); margin-bottom:28px;">View the assigned courts and upcoming hearing schedules for all your cases.</p>
+
+        {% if cases %}
+            {% for case in cases %}
+            <div class="case-court-card">
+                <div class="case-header">
+                    <span class="case-badge">{{ case.case_number }}</span>
+                    <span style="font-weight:600; font-size:1rem; flex:1;">{{ case.case_title }}</span>
+                    <span class="status-pill
+                        {% if case.case_status in ('Open','Active','Ongoing') %}status-open
+                        {% elif case.case_status == 'Closed' %}status-closed
+                        {% else %}status-pending{% endif %}">
+                        {{ case.case_status }}
+                    </span>
+                </div>
+
+                {% if case.court_name %}
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">🏛 Court Name</div>
+                        <div class="info-value">{{ case.court_name }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">⚖️ Court Type</div>
+                        <div class="info-value">{{ case.court_type or '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">📍 City</div>
+                        <div class="info-value">{{ case.city or '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">🗺 State</div>
+                        <div class="info-value">{{ case.state or '—' }}</div>
+                    </div>
+                </div>
+
+                {% if case.hearing_date %}
+                <div class="hearing-banner">
+                    <div class="hearing-icon">📅</div>
+                    <div class="hearing-text">
+                        <strong>Next Hearing: {{ case.hearing_date.strftime('%d %b %Y') if case.hearing_date else '—' }}</strong>
+                        {% if case.hearing_time %} &nbsp;·&nbsp; {{ case.hearing_time }}{% endif %}
+                        <br>
+                        <small>
+                            Status: {{ case.hearing_status or '—' }}
+                            {% if case.remarks %} · {{ case.remarks }}{% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% else %}
+                <div class="hearing-banner" style="border-left-color: rgba(255,255,255,0.15);">
+                    <div class="hearing-icon">📭</div>
+                    <div class="hearing-text">
+                        <strong style="color:rgba(255,255,255,0.5);">No upcoming hearings scheduled</strong>
+                        <br><small>Your advocate will schedule the next hearing soon.</small>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="no-court">
+                    🏛 No court assigned to this case yet. Your advocate will update this soon.
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+        {% else %}
+        <div class="empty-state">
+            <div class="icon">⚖️</div>
+            <p>No cases registered to your account yet.</p>
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('client_dashboard') }}" class="back-btn">← Back to Portal</a>
+    </div>
+</div>
+</body>
+</html>

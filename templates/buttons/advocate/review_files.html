@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client Documents | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+    <style>
+        .section-title {
+            color: #D4AF37;
+            font-size: 0.93rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 28px 0 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(212,175,55,0.2);
+        }
+        .doc-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+        .doc-table th {
+            background: rgba(212,175,55,0.1);
+            color: #D4AF37;
+            padding: 11px 14px;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.77rem;
+            border-bottom: 1px solid rgba(212,175,55,0.25);
+        }
+        .doc-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.82);
+            vertical-align: middle;
+        }
+        .doc-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .file-link {
+            color: #D4AF37;
+            text-decoration: none;
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(212,175,55,0.3);
+            transition: 0.2s;
+        }
+        .file-link:hover { color: #fff; border-color: #fff; }
+        .empty-msg { text-align:center; color:rgba(255,255,255,0.3); padding:25px; font-size:0.9rem; }
+    </style>
+</head>
+<body>
+<div class="overlay" style="align-items:flex-start; padding-top:100px;">
+
+    <!-- Logo -->
+    <div class="logo" style="position:fixed;top:25px;left:50px;display:flex;align-items:center;z-index:100;font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:#fff;letter-spacing:2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height:42px;width:auto;margin-right:12px;filter:drop-shadow(0 0 5px rgba(212,175,55,0.3));">
+        <span style="color:#D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width:1050px;">
+        <h1>Client Documents</h1>
+        <p style="color:rgba(255,255,255,0.5);font-size:0.88rem;margin-bottom:5px;">Access documents and files for clients currently assigned to you.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div style="color:#fff;background:{% if category=='error' %}rgba(255,77,77,0.18){% else %}rgba(0,230,118,0.15){% endif %};border:1px solid {% if category=='error' %}#ff4d4d{% else %}#00e676{% endif %};padding:10px 16px;border-radius:8px;margin-bottom:15px;font-size:0.88rem;text-align:center;">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- ===== DOCUMENT TABLE ===== -->
+        <h3 class="section-title">📋 Document Vault
+            <span style="float:right;font-size:0.78rem;font-weight:400;color:rgba(255,255,255,0.4);">{{ documents|length if documents else 0 }} file(s)</span>
+        </h3>
+
+        {% if documents %}
+        <div class="table-container" style="margin-top:0;">
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Client / Case</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Uploaded By</th>
+                        <th>Date</th>
+                        <th>File</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td><strong style="color:var(--gold);">#{{ doc.document_id }}</strong></td>
+                        <td>
+                            {% if doc.first_name %}
+                                {{ doc.first_name }} {{ doc.last_name or '' }}<br>
+                                <span style="font-size: 0.8em; color: rgba(255,255,255,0.5);">
+                                    {% if doc.case_number %}{{ doc.case_number }}{% else %}Personal Doc{% endif %}
+                                </span>
+                            {% else %}
+                                {{ doc.case_number }}
+                            {% endif %}
+                        </td>
+                        <td>{{ doc.document_title }}</td>
+                        <td>
+                            <span style="background:rgba(255,255,255,0.07);padding:2px 8px;border-radius:6px;font-size:0.78rem;">
+                                {{ doc.document_type }}
+                            </span>
+                        </td>
+                        <td style="color:rgba(255,255,255,0.6);">{{ doc.uploaded_by or '—' }}</td>
+                        <td style="color:rgba(255,255,255,0.5);font-size:0.82rem;">{{ doc.upload_date }}</td>
+                        <td>
+                            {% if doc.file_path %}
+                            <a href="{{ url_for('static', filename='uploads/documents/' + doc.file_path.split('/')[-1]) }}" target="_blank" class="file-link">📥 Download</a>
+                            {% else %}
+                            <span style="color:rgba(255,255,255,0.3);font-size:0.82rem;">No file</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty-msg">No documents found for your assigned clients.</p>
+        {% endif %}
+
+        <a href="/dashboard/advocate" class="back-link">← Back to Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

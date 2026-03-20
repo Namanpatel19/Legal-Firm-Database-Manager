@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .login-box h2 {
+            font-family: 'Playfair Display', serif;
+            color: #D4AF37;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <!-- Global Logo -->
+        <div class="logo" style="position: absolute; top: 30px; left: 60px; display: flex; align-items: center; z-index: 100; font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 2px;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height: 45px; width: auto; margin-right: 15px; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));">
+            <span style="color: #D4AF37;">INS</span> FIRM
+        </div>
+
+        <div class="login-box">
+            <h2>Verify Code</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div style="color: {% if category == 'error' %}#ff4d4d{% else %}#4dff4d{% endif %}; background: {% if category == 'error' %}rgba(255, 77, 77, 0.1){% else %}rgba(77, 255, 77, 0.1){% endif %}; border: 1px solid {% if category == 'error' %}#ff4d4d{% else %}#4dff4d{% endif %}; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; text-align:center;">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('verify_otp') }}" method="POST">
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 20px; text-align: center;">Enter the 6-digit code sent via SMS.</p>
+                <input type="text" name="otp" placeholder="6-digit OTP" required>
+                <button type="submit" class="btn">Verify OTP</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 15px; margin-bottom: 25px;">
+                <a href="{{ url_for('forgot_password') }}" style="color: #D4AF37; font-family: 'Poppins', sans-serif; font-size: 0.9rem; text-decoration: none; transition: 0.3s; padding: 5px;">Request a New Code</a>
+            </div>
+            <div style="text-align: center;">
+                <a href="{{ url_for('login') }}" style="color: rgba(255,255,255,0.5); font-family: 'Poppins', sans-serif; font-size: 0.8rem; text-decoration: none;">Back to Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

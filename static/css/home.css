@@ -1,0 +1,312 @@
+/* General Reset & Smooth Scrolling */
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+    background: url("../images/background_image.png") no-repeat center center fixed;
+    background-size: cover;
+    background-color: #0f172a;
+}
+
+/* Container and Background (Hero Section) */
+.overlay {
+    background: rgba(0, 0, 0, 0.7);
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: st;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Navigation Bar Styling - Absolute (Not Sticky) */
+.navbar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 30px 60px;
+    display: flex;
+    justify-content: space-between;
+    
+    align-items: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.logo, .nav-links a {
+    pointer-events: auto;
+}
+
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+}
+
+.nav-brand-logo {
+    height: 45px;
+    width: auto;
+    margin-right: 15px;
+    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));
+}
+
+.gold-text {
+    color: #D4AF37;
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 30px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.3s;
+    opacity: 0.8;
+}
+
+.nav-links a:hover {
+    color: #D4AF37;
+    opacity: 1;
+}
+
+/* The Glassmorphism Box (Home) */
+.home-box {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    padding: 60px 40px;
+    border-radius: 20px;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    pointer-events: auto;
+}
+
+.home-box h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.home-box p {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: 40px;
+    font-weight: 300;
+}
+
+/* Login Button Styling */
+.btn {
+    display: block;
+    padding: 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.4s ease;
+}
+
+.primary-btn {
+    background: #D4AF37;
+    color: #000;
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+}
+
+.primary-btn:hover {
+    background: #fff;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+}
+
+.gold-text-wel {
+    color: #D4AF37;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/* --- Content Sections (About & Contact) --- */
+
+.content-section {
+    padding: 100px 20px;
+    background: rgba(0, 0, 0, 0.7);
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+
+/* Same to Same Glass Effect as Home Box */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 20px;
+    padding: 60px 40px;
+    width: 100%;
+    max-width: 1000px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    pointer-events: auto;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #D4AF37;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.section-desc {
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 50px;
+    line-height: 1.8;
+}
+
+/* Grids */
+.info-grid, .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+}
+
+.info-item h3 {
+    color: #D4AF37;
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+}
+
+.info-item ul {
+    list-style: none;
+}
+
+.info-item ul li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+    color: rgba(255,255,255,0.8);
+}
+
+.info-item ul li::before {
+    content: "•";
+    color: #D4AF37;
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/* Contact Specific Cards */
+.contact-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.contact-card:hover {
+    border-color: #D4AF37;
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.role-tag {
+    display: block;
+    color: #D4AF37;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 5px 0 10px 0;
+}
+
+.phone-info {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 1.2rem;
+    color: #D4AF37;
+}
+
+/* --- Minimalist Legal Footer --- */
+.legal-footer {
+    padding: 100px 20px 60px; /* Large top padding to separate from content */
+    background: rgba(0, 0, 0, 0.7);
+    background-attachment: fixed;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.footer-inner {
+    text-align: center;
+    max-width: 800px;
+    pointer-events: auto;
+}
+
+.footer-tagline {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-style: italic;
+    color: #D4AF37; /* Gold color */
+    letter-spacing: 1px;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    /* Subtle text shadow for readability against dark backgrounds */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.footer-divider {
+    height: 1px;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+    margin: 0 auto 30px;
+    opacity: 0.5;
+}
+
+.footer-copyright {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 3px; /* Spaced out letters for a modern look */
+    text-transform: uppercase;
+    font-weight: 300;
+}
+
+.footer-copyright .gold-text {
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .footer-tagline {
+        font-size: 1.2rem;
+    }
+    .legal-footer {
+        padding: 60px 20px 40px;
+    }
+}

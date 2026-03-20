@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Lex Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+</head>
+<body>
+
+<div class="overlay">
+
+    <!-- Global Logo -->
+    <div class="logo" style="position: absolute; top: 30px; left: 60px; display: flex; align-items: center; z-index: 100; font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height: 45px; width: auto; margin-right: 15px; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));">
+        <span style="color: #D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card">
+        <h1>Hearing Schedule</h1>
+        <p>Update court dates and hearing status.</p>
+        
+        <form class="form-container">
+            <div class="action-grid">
+                <select name="case_id">
+                    <option>Select Case Title</option>
+                </select>
+                <input type="date" name="hearing_date" required>
+                <input type="time" name="hearing_time">
+                <select name="status">
+                    <option>Scheduled</option>
+                    <option>Adjourned</option>
+                    <option>Completed</option>
+                </select>
+                <textarea placeholder="Court Remarks/Summary" style="grid-column: span 1;"></textarea>
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top:20px;">Update Court Diary</button>
+        </form>
+         <a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
+    </div>
+</div>
+</body>
+</html>
+

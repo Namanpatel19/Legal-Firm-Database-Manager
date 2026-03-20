@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New Client Entry | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+</head>
+<body>
+<div class="overlay">
+
+    <div class="logo" style="position: absolute; top: 30px; left: 60px; display: flex; align-items: center; z-index: 100; font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height: 45px; width: auto; margin-right: 15px; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));">
+        <span style="color: #D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card">
+        <h1>New Client Entry</h1>
+        <p>Establish a new client profile in the secure database.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div style="color:#fff; background:{% if category=='error' %}rgba(255,77,77,0.2){% else %}rgba(77,255,77,0.2){% endif %}; border:1px solid {% if category=='error' %}#ff4d4d{% else %}#4dff4d{% endif %}; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9rem; text-align:center;">
+              {{ message }}
+            </div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+
+        <form class="form-container" action="{{ form_action }}" method="POST">
+            <div class="action-grid">
+                <input type="text" name="first_name" placeholder="First Name" required>
+                <input type="text" name="last_name" placeholder="Last Name">
+                <input type="email" name="email" placeholder="Email Address" required>
+                <div style="display:flex; gap:10px;">
+                    <select name="phone_country_code" style="width: 120px; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; font-size: 1rem;">
+                        <option value="+91" selected>+91</option>
+                        <option value="+1">+1</option>
+                        <option value="+44">+44</option>
+                        <option value="+61">+61</option>
+                    </select>
+                    <input type="text" name="phone_number" placeholder="Phone Number (e.g. 9876543210)" style="flex:1;">
+                </div>
+                <input type="text" name="address" placeholder="Permanent Address">
+                <input type="password" name="password" placeholder="Client Portal Password" required>
+            </div>
+
+            <!-- Optional Case Details Section -->
+            <div style="margin-top: 25px; background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <label style="display: flex; align-items: center; color: #fff; font-weight: 500; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="add_case_toggle" name="add_case" value="yes" style="margin-right: 12px; cursor: pointer; width: 20px; height: 20px;">
+                    Add initial case for this client?
+                </label>
+                
+                <div id="case_details_section" style="display: none; margin-top: 20px;">
+                    <h3 style="color: #D4AF37; font-size: 1.1rem; margin-bottom: 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 5px;">Case Details</h3>
+                    <div class="action-grid">
+                        <input type="text" name="case_number" placeholder="Case Number (e.g. CR-2023-001)">
+                        <input type="text" name="case_title" placeholder="Case Title (e.g. State v. Doe)">
+                        <select name="case_type" style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 1rem; width: 100%;">
+                            <option value="Select" style="color: #000;" disabled selected>Select Case Type</option>
+                            <option value="Civil" style="color: #000;">Civil</option>
+                            <option value="Criminal" style="color: #000;">Criminal</option>
+                            <option value="Corporate" style="color: #000;">Corporate</option>
+                            <option value="Family" style="color: #000;">Family</option>
+                            <option value="Real Estate" style="color: #000;">Real Estate</option>
+                            <option value="Intellectual Property" style="color: #000;">Intellectual Property</option>
+                            <option value="Others" style="color: #000;">Others</option>
+                        </select>
+                        <select name="court_id" style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 1rem; width: 100%;">
+                            <option value="" style="color: #000;" disabled selected>Select Court</option>
+                            {% for court in courts %}
+                            <option value="{{ court.court_id }}" style="color: #000;">{{ court.court_name }} - {{ court.city }}</option>
+                            {% endfor %}
+                        </select>
+                        <textarea name="description" placeholder="Brief Case Description" style="grid-column: 1 / -1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 1rem; width: 100%; min-height: 80px; resize: vertical; margin-top: 10px;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top:25px;">Create Client Profile</button>
+        </form>
+
+        <a href="{{ back_url }}" class="back-link">← Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggle = document.getElementById('add_case_toggle');
+        const section = document.getElementById('case_details_section');
+        const caseInputs = section.querySelectorAll('input, select, textarea');
+
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                section.style.display = 'block';
+                // Make case fields required when toggle is on
+                caseInputs.forEach(input => {
+                    if (input.name === 'case_number' || input.name === 'case_title' || input.name === 'case_type' || input.name === 'court_id') {
+                        input.required = true;
+                    }
+                });
+            } else {
+                section.style.display = 'none';
+                // Remove required attribute when toggle is off
+                caseInputs.forEach(input => {
+                    input.required = false;
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Law Firm System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<header>
+    <div class="logo" style="position: absolute; top: 30px; left: 60px; display: flex; align-items: center; z-index: 100; font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height: 45px; width: auto; margin-right: 15px; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));">
+        <span style="color: #D4AF37;">INS</span> FIRM
+    </div>
+    <h2>Law Firm Management System</h2>
+
+<nav>
+<a href="/">Home</a>
+<a href="/login">Login</a>
+</nav>
+
+</header>
+
+<hr>
+
+{% block content %}
+
+{% endblock %}
+
+</body>
+</html>

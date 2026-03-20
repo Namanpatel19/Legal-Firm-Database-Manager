@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+   <div class="overlay">
+
+    <!-- Home Button -->
+    <a href="/" style="position: absolute; top: 30px; right: 40px; z-index: 200; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.5); color: #D4AF37; padding: 8px 18px; border-radius: 25px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: 0.3s; letter-spacing: 0.5px;" onmouseover="this.style.background='rgba(212,175,55,0.3)'" onmouseout="this.style.background='rgba(212,175,55,0.15)'">🏠 Home</a>
+
+    <!-- Global Logo -->
+    <div class="logo" style="position: absolute; top: 30px; left: 60px; display: flex; align-items: center; z-index: 100; font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height: 45px; width: auto; margin-right: 15px; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));">
+        <span style="color: #D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card">
+        <h1>Welcome, Admin {{ session.get('user_name', '') }}</h1>
+        <p>Manage Firm Users and Case Assignments</p>
+        <div class="action-grid">
+            <a href="/admin/create_advocate" class="tile">Create Advocate</a>
+            <a href="/admin/create_client" class="tile">Create Client</a>
+            <a href="/admin/create_case" class="tile">Create Case</a>
+            <a href="/admin/assign_case" class="tile">Assign Case File</a>
+            <a href="/admin/update_hearing" class="tile">Update Hearings</a>
+            <a href="/admin/update_verdict" class="tile">Record Verdict</a>
+            <a href="/admin/review_files" class="tile">Review Documents</a>
+            <a href="/admin/review_evidence" class="tile">Review Evidence</a>
+            <a href="/admin/view_client" class="tile">View Clients</a>
+            <a href="/admin/view_advocates" class="tile">View Advocates</a>
+            <a href="/admin/view_cases" class="tile">View Cases</a>
+            <a href="/admin/view_assignments" class="tile">View Assignments</a>
+            <a href="/admin/directory_view" class="tile">View Courts</a>
+            <a href="/admin/financial_reports" class="tile">Finance / Payments</a>
+            <a href="/admin/add_payment" class="tile">Add Payment</a>
+            <a href="/admin/close_case" class="tile">Close Case</a>
+            <a href="/admin/reopen" class="tile">Reopen Case</a>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client Directory | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+</head>
+<body>
+
+<div class="overlay">
+
+    <!-- Global Logo -->
+    <div class="logo" style="position: absolute; top: 30px; left: 60px; display: flex; align-items: center; z-index: 100; font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" style="height: 45px; width: auto; margin-right: 15px; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));">
+        <span style="color: #D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width: 1100px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h1>Client Directory</h1>
+            <a href="/admin/create_client" class="btn-submit" style="width:auto; margin:0; padding: 8px 20px; font-size: 0.85rem;">+ Add Client</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div style="color:#fff; background:{% if category=='error' %}rgba(255,77,77,0.2){% else %}rgba(77,255,77,0.2){% endif %}; border:1px solid {% if category=='error' %}#ff4d4d{% else %}#4dff4d{% endif %}; padding:10px; border-radius:8px; margin-bottom:12px; text-align:center; font-size:0.9rem;">{{ message }}</div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+
+        <!-- Search Box -->
+        <div style="margin-bottom: 15px;">
+            <input type="text" id="clientSearch" placeholder="🔍  Search by name, email or phone…"
+                oninput="filterClients()"
+                style="width:100%; padding:12px 18px; border-radius:10px; border:1px solid rgba(212,175,55,0.3);
+                       background:rgba(255,255,255,0.06); color:#fff; font-size:0.9rem; outline:none;
+                       font-family:'Poppins',sans-serif; transition:0.3s;"
+                onfocus="this.style.borderColor='#D4AF37'" onblur="this.style.borderColor='rgba(212,175,55,0.3)'">
+        </div>
+
+        <div class="table-container">
+            <table id="clientTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="clientBody">
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.client_id }}</td>
+                        <td>{{ client.first_name }} {{ client.last_name or '' }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.phone_number or '—' }}</td>
+                        <td>{{ client.address or '—' }}</td>
+                        <td>
+                            <button data-type="client" data-id="{{ client.client_id }}" data-first_name="{{ client.first_name }}" data-last_name="{{ client.last_name or '' }}" data-email="{{ client.email }}" data-phone_number="{{ client.phone_number or '' }}" data-address="{{ client.address or '' }}" onclick="handleUpdateClick(this)" style="background: rgba(212, 175, 55, 0.2); border: 1px solid #D4AF37; color: #D4AF37; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: 0.2s; margin-right: 5px;">Update</button>
+                            <button onclick="deleteRecord('client', {{ client.client_id }})" style="background: rgba(255, 77, 77, 0.2); border: 1px solid #ff4d4d; color: #ff4d4d; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: 0.2s;">Delete</button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" style="text-align:center; color:rgba(255,255,255,0.4); padding:20px;">No clients registered yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p id="noClientResult" style="display:none; text-align:center; color:rgba(255,255,255,0.35); padding:15px; font-size:0.9rem;">No results found.</p>
+        </div>
+
+        <a href="{{ url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+function filterClients() {
+    const q = document.getElementById('clientSearch').value.toLowerCase();
+    const rows = document.querySelectorAll('#clientBody tr');
+    let visible = 0;
+    rows.forEach(row => {
+        const show = row.innerText.toLowerCase().includes(q);
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+    document.getElementById('noClientResult').style.display = visible === 0 ? 'block' : 'none';
+}
+
+async function deleteRecord(type, id) {
+    if (!confirm(`Are you sure you want to delete this ${type}? This action cannot be undone.`)) return;
+    
+    try {
+        const response = await fetch(`/api/delete/${type}/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            location.reload();
+        } else {
+            alert('Error deleting record: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while deleting.');
+    }
+}
+</script>
+
+{% include 'buttons/shared/update_modal.html' %}
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Case Assignment | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+    <style>
+        /* Ensure dropdowns are fully visible and styled */
+        .action-grid {
+            overflow: visible !important;
+        }
+        .action-grid > div {
+            overflow: visible;
+        }
+        select {
+            display: block;
+            width: 100%;
+            padding: 14px 40px 14px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='%23D4AF37'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        select:focus {
+            border-color: #D4AF37;
+            background-color: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+        }
+        select option {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            padding: 10px;
+        }
+        .dashboard-card {
+            overflow: visible;
+        }
+    </style>
+</head>
+<body>
+<div class="overlay">
+
+    <div class="logo" style="position:absolute;top:30px;left:60px;display:flex;align-items:center;z-index:100;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height:45px;width:auto;margin-right:15px;filter:drop-shadow(0 0 5px rgba(212,175,55,0.3));">
+        <span style="color:#D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width: 780px; overflow: visible;">
+        <h1>Case Assignment</h1>
+        <p style="color:rgba(255,255,255,0.55); margin-bottom:10px;">Link a legal case to a lead advocate from the registry.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div style="color:#fff;background:{% if category=='error' %}rgba(255,77,77,0.2){% else %}rgba(77,255,77,0.2){% endif %};border:1px solid {% if category=='error' %}#ff4d4d{% else %}#4dff4d{% endif %};padding:10px;border-radius:8px;margin-bottom:12px;text-align:center;">{{ message }}</div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+
+        <form class="form-container" action="{{ form_action if form_action else '/admin/assign_case' }}" method="POST">
+            <div class="action-grid" style="grid-template-columns: 1fr; gap: 22px; overflow: visible;">
+
+                <div>
+                    <label style="color:#D4AF37;font-size:0.82rem;display:block;margin-bottom:8px;letter-spacing:0.5px;">SELECT CASE</label>
+                    <select name="case_id" required>
+                        <option value="" disabled selected>— Choose Case —</option>
+                        {% for case in cases %}
+                        <option value="{{ case.case_id }}">
+                            {{ case.case_number }} | {{ case.case_title }} ({{ case.first_name }} {{ case.last_name or '' }}) — {{ case.case_status }}
+                        </option>
+                        {% else %}
+                        <option disabled>No active cases found</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label style="color:#D4AF37;font-size:0.82rem;display:block;margin-bottom:8px;letter-spacing:0.5px;">SELECT ADVOCATE</label>
+                    <select name="advocate_id" required>
+                        <option value="" disabled selected>— Choose Advocate —</option>
+                        {% for adv in advocates %}
+                        <option value="{{ adv.advocate_id }}">
+                            {{ adv.first_name }} {{ adv.last_name or '' }} — {{ adv.specialization or 'General' }}
+                        </option>
+                        {% else %}
+                        <option disabled>No advocates registered</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label style="color:#D4AF37;font-size:0.82rem;display:block;margin-bottom:8px;letter-spacing:0.5px;">ASSIGNMENT ROLE</label>
+                    <select name="role">
+                        <option value="Lead Counsel">Lead Counsel</option>
+                        <option value="Co-Counsel">Co-Counsel</option>
+                        <option value="Junior Advocate">Junior Advocate</option>
+                        <option value="Observer">Observer</option>
+                    </select>
+                </div>
+
+            </div>
+            <button type="submit" class="btn-submit" style="margin-top:28px;">✓ Finalize Assignment</button>
+        </form>
+
+        <a href="{{ back_url if back_url else url_for('admin_dashboard') }}" class="back-link">← Back to Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

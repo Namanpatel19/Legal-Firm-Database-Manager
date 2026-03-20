@@ -1,0 +1,177 @@
+<!-- Update Modal and Script -->
+<div id="updateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#1a1a2e; border:1px solid rgba(212,175,55,0.3); border-radius:15px; padding:30px; width:400px; position:relative; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+        <button onclick="closeUpdateModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:rgba(255,255,255,0.5); font-size:1.2rem; cursor:pointer;">&times;</button>
+        <h2 style="color:#D4AF37; font-family:'Playfair Display',serif; text-align:center; margin-bottom:20px;" id="updateModalTitle">Update Record</h2>
+        
+        <form id="updateForm" onsubmit="submitUpdate(event)">
+            <input type="hidden" id="updateRecordType" name="record_type">
+            <input type="hidden" id="updateRecordId" name="record_id">
+            
+            <div id="updateFormFields" style="display:flex; flex-direction:column; gap:15px;">
+                <!-- Fields injected dynamically via JS -->
+            </div>
+            
+            <button type="submit" style="width:100%; background:#D4AF37; color:#000; font-weight:600; padding:12px; border:none; border-radius:8px; margin-top:20px; cursor:pointer; font-family:'Poppins',sans-serif;">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+let updateConfig = {};
+
+function handleUpdateClick(btn) {
+    const type = btn.getAttribute('data-type');
+    const id = btn.getAttribute('data-id');
+    const data = { ...btn.dataset };
+    
+    document.getElementById('updateRecordType').value = type;
+    document.getElementById('updateRecordId').value = id;
+    
+    // Capitalize first letter
+    const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+    document.getElementById('updateModalTitle').innerText = `Update ${typeLabel}`;
+    
+    const fieldsContainer = document.getElementById('updateFormFields');
+    fieldsContainer.innerHTML = '';
+    
+    // Generate fields based on data object
+    for (const [key, value] of Object.entries(data)) {
+        if (key === 'id' || key === 'record_type') continue;
+        
+        const labelText = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        
+        const div = document.createElement('div');
+        div.innerHTML = `<label style="color:var(--gold, #D4AF37); font-size:0.8rem; display:block; margin-bottom:5px;">${labelText}</label>`;
+
+        if (key === 'payment_status') {
+            div.innerHTML += `
+                <select name="${key}" required style="width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#fff; font-family:'Poppins',sans-serif; outline:none;">
+                    <option value="Pending" ${value === 'Pending' ? 'selected' : ''}>Pending</option>
+                    <option value="Completed" ${value === 'Completed' ? 'selected' : ''}>Completed</option>
+                    <option value="Failed" ${value === 'Failed' ? 'selected' : ''}>Failed</option>
+                </select>
+            `;
+        } else if (key === 'payment_mode') {
+            div.innerHTML += `
+                <select name="${key}" required style="width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#fff; font-family:'Poppins',sans-serif; outline:none;">
+                    <option value="Cash" ${value === 'Cash' ? 'selected' : ''}>Cash</option>
+                    <option value="Cheque" ${value === 'Cheque' ? 'selected' : ''}>Cheque</option>
+                    <option value="UPI" ${value === 'UPI' ? 'selected' : ''}>UPI</option>
+                    <option value="Bank Transfer" ${value === 'Bank Transfer' ? 'selected' : ''}>Bank Transfer</option>
+                    <option value="Card" ${value === 'Card' ? 'selected' : ''}>Card</option>
+                </select>
+            `;
+        } else if (key === 'hearing_status') {
+            div.innerHTML += `
+                <select name="${key}" required style="width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#fff; font-family:'Poppins',sans-serif; outline:none;">
+                    <option value="Scheduled" ${value === 'Scheduled' ? 'selected' : ''}>Scheduled</option>
+                    <option value="Completed" ${value === 'Completed' ? 'selected' : ''}>Completed</option>
+                    <option value="Adjourned" ${value === 'Adjourned' ? 'selected' : ''}>Adjourned</option>
+                </select>
+            `;
+        } else if (key === 'case_status' || key === 'case_status_after') {
+            div.innerHTML += `
+                <select name="${key}" required style="width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#fff; font-family:'Poppins',sans-serif; outline:none;">
+                    <option value="Open" ${value === 'Open' ? 'selected' : ''}>Open</option>
+                    <option value="Pending" ${value === 'Pending' ? 'selected' : ''}>Pending</option>
+                    <option value="Closed" ${value === 'Closed' ? 'selected' : ''}>Closed</option>
+                    <option value="Settled" ${value === 'Settled' ? 'selected' : ''}>Settled</option>
+                    <option value="Dismissed" ${value === 'Dismissed' ? 'selected' : ''}>Dismissed</option>
+                </select>
+            `;
+        } else if (key === 'payment_date' || key === 'hearing_date' || key === 'verdict_date') {
+            div.innerHTML += `
+                <input type="date" name="${key}" value="${value || ''}" required 
+                       style="width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#fff; font-family:'Poppins',sans-serif; outline:none; box-sizing:border-box;">
+            `;
+        } else if (key === 'phone_number' || key === 'phone_number_alt') {
+            // Phone number field includes country code dropdown + digits input
+            const codeFieldName = `${key}_country_code`;
+            const digitsFieldName = `${key}_digits`;
+
+            // Determine initial values (separate code from digits if already provided)
+            let initialCode = '+91';
+            let initialDigits = value || '';
+            const knownCodes = ['+91', '+1', '+44', '+61'];
+            if (value && value.startsWith('+')) {
+                for (const c of knownCodes) {
+                    if (value.startsWith(c)) {
+                        initialCode = c;
+                        initialDigits = value.slice(c.length);
+                        break;
+                    }
+                }
+            }
+
+            div.innerHTML += `
+                <div style="display:flex; gap:10px;">
+                    <select name="${codeFieldName}" style="width:120px; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); color:#fff; font-family:'Poppins',sans-serif;">
+                        <option value="+91" ${initialCode === '+91' ? 'selected' : ''}>+91</option>
+                        <option value="+1" ${initialCode === '+1' ? 'selected' : ''}>+1</option>
+                        <option value="+44" ${initialCode === '+44' ? 'selected' : ''}>+44</option>
+                        <option value="+61" ${initialCode === '+61' ? 'selected' : ''}>+61</option>
+                    </select>
+                    <input type="text" name="${digitsFieldName}" value="${initialDigits || ''}" required pattern="\\d*" inputmode="numeric" oninput="this.value=this.value.replace(/\\D/g,'')" 
+                           style="flex:1; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#fff; font-family:'Poppins',sans-serif; outline:none; box-sizing:border-box;">
+                    <input type="hidden" name="${key}" id="${key}_hidden">
+                </div>
+            `;
+        } else {
+            div.innerHTML += `
+                <input type="text" name="${key}" value="${value || ''}" required 
+                       style="width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:#fff; font-family:'Poppins',sans-serif; outline:none; box-sizing:border-box;">
+            `;
+        }
+        fieldsContainer.appendChild(div);
+    }
+    
+    document.getElementById('updateModal').style.display = 'flex';
+}
+
+function closeUpdateModal() {
+    document.getElementById('updateModal').style.display = 'none';
+}
+
+async function submitUpdate(e) {
+    e.preventDefault();
+    
+    const type = document.getElementById('updateRecordType').value;
+    const id = document.getElementById('updateRecordId').value;
+    const formData = new FormData(document.getElementById('updateForm'));
+    const submitBtn = document.querySelector('#updateForm button[type="submit"]');
+    
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Saving...';
+    
+    // Before submitting, combine phone country code + digits (if present)
+    [ 'phone_number', 'phone_number_alt' ].forEach(field => {
+        const codeEl = formData.get(`${field}_country_code`);
+        const digitsEl = formData.get(`${field}_digits`);
+        if (codeEl && digitsEl) {
+            formData.set(field, `${codeEl}${digitsEl}`);
+        }
+    });
+
+    try {
+        const response = await fetch(`/api/update/${type}/${id}`, {
+            method: 'POST',
+            body: formData // Send as form data urlencoded format
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            location.reload();
+        } else {
+            alert('Error updating record: ' + (result.error || 'Unknown error'));
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Save Changes';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while updating.');
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Save Changes';
+    }
+}
+</script>

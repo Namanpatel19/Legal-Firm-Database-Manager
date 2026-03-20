@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INS Law Firm | Excellence in Law</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="INS FIRM Logo" class="nav-brand-logo">
+            <span class="gold-text">INS</span> FIRM
+        </div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <div class="overlay">
+        <div class="home-box">
+            <h1>Justice & Professionalism</h1>
+            <p><span class="gold-text-wel">Welcome to our Law Firm Management System </span> <br> Access your dedicated
+                portal to manage cases, documents, and hearings with ease.</p>
+
+            <div class="home-buttons">
+                <a href="{{ url_for('login') }}" class="btn primary-btn">Login to Portal</a>
+            </div>
+        </div>
+    </div>
+
+    <section id="about" class="content-section">
+        <div class="glass-panel">
+            <h2 class="section-title">About Us</h2>
+            <p class="section-desc">Welcome to <strong>INS Law Firm</strong>, where professionalism, integrity, and
+                dedication form the foundation of our legal services. We are committed to providing reliable and
+                effective legal assistance to individuals, families, and businesses.</p>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <h3>What We Offer</h3>
+                    <ul>
+                        <li>Legal consultation and advisory services</li>
+                        <li>Case representation and documentation support</li>
+                        <li>Corporate and business legal assistance</li>
+                        <li>Civil and criminal matter handling</li>
+                        <li>Family and property dispute resolution</li>
+                    </ul>
+                </div>
+                <div class="info-item">
+                    <h3>Why Choose Us</h3>
+                    <ul>
+                        <li>Experienced legal professionals</li>
+                        <li>Client-focused personalized solutions</li>
+                        <li>Strong commitment to confidentiality</li>
+                        <li>Clear guidance at every stage</li>
+                        <li>Dedicated support and timely response</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="content-section">
+        <div class="glass-panel">
+            <h2 class="section-title">Contact Our Team</h2>
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <h4>Naman Patel</h4>
+                    <span class="role-tag">CEO</span>
+                    <p>naman.patel1@insfirm.in</p>
+                </div>
+
+                <div class="contact-card">
+                    <h4>Hemangi Mourya </h4>
+                    <span class="role-tag">Manager</span>
+                    <p>hemangi.mourya@insfirm.in</p>
+                </div>
+
+                <div class="contact-card">
+                    <h4>Inzila Khan</h4>
+                    <span class="role-tag">Employee</span>
+                    <p>inzila.khan@insfirm.in</p>
+                </div>
+
+
+
+                <div class="contact-card">
+                    <h4>Stuti Jagtap</h4>
+                    <span class="role-tag">Employee</span>
+                    <p>stuti.jagtap@insfirm.in</p>
+                </div>
+
+
+
+
+
+            </div>
+            <div class="phone-info">
+                <p>📞 7489292989 | 6264697879</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="legal-footer">
+        <div class="footer-inner">
+            <p class="footer-tagline">"Committed to Justice, Driven by Excellence"</p>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-copyright">
+                <p>&copy; 2026 <span class="gold-text">INS</span> LAW FIRM. ALL RIGHTS RESERVED.</p>
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

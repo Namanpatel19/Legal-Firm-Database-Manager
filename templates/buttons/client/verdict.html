@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verdict Details | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client-button.css') }}">
+    <style>
+        .verdict-card {
+            background: linear-gradient(135deg,rgba(255,255,255,0.04) 0%,rgba(212,175,55,0.05) 100%);
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 18px; padding: 28px; margin-bottom: 22px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .verdict-card:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(212,175,55,0.12); }
+        .verdict-header { display:flex; align-items:center; gap:14px; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid rgba(212,175,55,0.15); }
+        .case-badge { background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.35); color:#D4AF37; font-size:0.78rem; font-weight:700; padding:4px 14px; border-radius:20px; letter-spacing:0.5px; }
+        .result-pill { padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:700; }
+        .result-won { background:rgba(0,230,118,0.12); color:#00e676; border:1px solid rgba(0,230,118,0.3); }
+        .result-lost { background:rgba(255,77,77,0.12); color:#ff6b6b; border:1px solid rgba(255,77,77,0.3); }
+        .result-settled { background:rgba(100,149,237,0.12); color:#6495ED; border:1px solid rgba(100,149,237,0.3); }
+        .result-other { background:rgba(255,215,64,0.12); color:#ffd740; border:1px solid rgba(255,215,64,0.3); }
+        .info-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:16px; }
+        .info-item { background:rgba(255,255,255,0.03); border-radius:10px; padding:14px 18px; }
+        .info-label { font-size:0.7rem; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+        .info-value { font-size:0.95rem; color:#fff; font-weight:500; }
+        .summary-box { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px 20px; font-size:0.88rem; color:rgba(255,255,255,0.75); line-height:1.6; }
+    </style>
+</head>
+<body>
+<div class="overlay">
+
+    <div class="logo" style="position:absolute;top:30px;left:60px;display:flex;align-items:center;z-index:100;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height:45px;width:auto;margin-right:15px;filter:drop-shadow(0 0 5px rgba(212,175,55,0.3));">
+        <span style="color:#D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width:920px;">
+        <h1>Verdict Details</h1>
+        <p style="color:rgba(255,255,255,0.55);margin-bottom:28px;">View the court judgment and verdict details for your cases.</p>
+
+        {% if verdicts %}
+            {% for v in verdicts %}
+            <div class="verdict-card">
+                <div class="verdict-header">
+                    <span class="case-badge">{{ v.case_number }}</span>
+                    <span style="font-weight:600;font-size:1rem;flex:1;">{{ v.case_title }}</span>
+                    <span class="result-pill
+                        {% if v.verdict_result in ('Won','In Favor') %}result-won
+                        {% elif v.verdict_result in ('Lost','Against') %}result-lost
+                        {% elif v.verdict_result == 'Settled' %}result-settled
+                        {% else %}result-other{% endif %}">
+                        {{ v.verdict_result or 'Pending' }}
+                    </span>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Verdict Date</div>
+                        <div class="info-value">{{ v.verdict_date.strftime('%d %b %Y') if v.verdict_date else '—' }}</div>
+                    </div>
+                    {% if v.fine_amount %}
+                    <div class="info-item">
+                        <div class="info-label">Fine Amount</div>
+                        <div class="info-value">₹ {{ v.fine_amount }}</div>
+                    </div>
+                    {% endif %}
+                    {% if v.imprisonment_years %}
+                    <div class="info-item">
+                        <div class="info-label">Imprisonment</div>
+                        <div class="info-value">{{ v.imprisonment_years }} year(s)</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if v.judgement_summary %}
+                <div>
+                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Judgment Summary</div>
+                    <div class="summary-box">{{ v.judgement_summary }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+        <div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.3);">
+            <div style="font-size:3rem;margin-bottom:16px;"></div>
+            <p>No verdict details available for your cases yet.</p>
+            <p style="font-size:0.85rem;margin-top:8px;">Judgment details will appear here once the court delivers its verdict.</p>
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('client_dashboard') }}" class="back-btn">← Back to Portal</a>
+    </div>
+</div>
+</body>
+</html>

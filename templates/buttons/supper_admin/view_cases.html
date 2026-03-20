@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Cases | INS Firm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-button.css') }}">
+</head>
+<body>
+<div class="overlay">
+
+    <div class="logo" style="position:absolute;top:30px;left:60px;display:flex;align-items:center;z-index:100;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:2px;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height:45px;width:auto;margin-right:15px;filter:drop-shadow(0 0 5px rgba(212,175,55,0.3));">
+        <span style="color:#D4AF37;">INS</span> FIRM
+    </div>
+
+    <div class="dashboard-card" style="max-width:1150px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h1>All Registered Cases</h1>
+            <span style="color:var(--gold);font-weight:600;">{{ cases|length }} total case(s)</span>
+        </div>
+
+        <a href="{{ url_for('superadmin_dashboard') }}" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.75);padding:7px 16px;border-radius:20px;font-size:0.82rem;text-decoration:none;margin:12px 0 16px;transition:0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">← Back to Dashboard</a>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div style="color:#fff;background:{% if category=='error' %}rgba(255,77,77,0.18){% else %}rgba(77,255,77,0.18){% endif %};border:1px solid {% if category=='error' %}#ff4d4d{% else %}#4dff4d{% endif %};padding:11px 16px;border-radius:10px;margin-bottom:14px;font-size:0.88rem;">{{ message }}</div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+
+        <div style="margin:15px 0;">
+            <input type="text" id="caseSearch" placeholder="🔍  Search by case #, client, type or status…"
+                oninput="filterCases()"
+                style="width:100%;padding:12px 18px;border-radius:10px;border:1px solid rgba(212,175,55,0.3);
+                       background:rgba(255,255,255,0.06);color:#fff;font-size:0.9rem;outline:none;
+                       font-family:'Poppins',sans-serif;transition:0.3s;"
+                onfocus="this.style.borderColor='#D4AF37'" onblur="this.style.borderColor='rgba(212,175,55,0.3)'">
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case #</th>
+                        <th>Case Title</th>
+                        <th>Client</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Court</th>
+                        <th style="min-width:200px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="caseBody">
+                    {% for case in cases %}
+                    <tr>
+                        <td><strong>{{ case.case_number }}</strong></td>
+                        <td>{{ case.case_title }}</td>
+                        <td>{{ case.first_name }} {{ case.last_name or '' }}</td>
+                        <td>{{ case.case_type or '—' }}</td>
+                        <td>
+                            {% if case.case_status in ('Open', 'Ongoing', 'Active') %}
+                                <span style="color:#00e676;">● {{ case.case_status }}</span>
+                            {% elif case.case_status == 'Pending' %}
+                                <span style="color:#ffd740;">{{ case.case_status }}</span>
+                            {% elif case.case_status in ('Closed','Dismissed','Settled') %}
+                                <span style="color:#aaa;">{{ case.case_status }}</span>
+                            {% else %}
+                                <span style="color:#ff9800;">{{ case.case_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-size:0.8rem;color:rgba(255,255,255,0.6);">{{ case.court_name or '—' }}</td>
+                        <td style="white-space:nowrap;">
+                            <button
+                                data-type="case"
+                                data-id="{{ case.case_id }}"
+                                data-case_title="{{ case.case_title }}"
+                                data-case_type="{{ case.case_type or '' }}"
+                                data-case_status="{{ case.case_status }}"
+                                data-description="{{ case.description or '' }}"
+                                onclick="handleUpdateClick(this)"
+                                style="background:rgba(212,175,55,0.2);border:1px solid #D4AF37;color:#D4AF37;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:0.78rem;margin-right:4px;">
+                                Update
+                            </button>
+                            <button onclick="openCourtModal({{ case.case_id }}, '{{ case.case_number }}')"
+                                style="background:rgba(100,149,237,0.2);border:1px solid #6495ED;color:#6495ED;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:0.78rem;margin-right:4px;">
+                                Court
+                            </button>
+                            <button onclick="deleteRecord('case', {{ case.case_id }})"
+                                style="background:rgba(255,77,77,0.2);border:1px solid #ff4d4d;color:#ff4d4d;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:0.78rem;">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align:center;color:rgba(255,255,255,0.4);padding:25px;">No cases found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p id="noCaseResult" style="display:none;text-align:center;color:rgba(255,255,255,0.35);padding:15px;">No results found.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Court Assignment Modal -->
+<div id="courtModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;justify-content:center;align-items:center;">
+    <div style="background:#1a1a2e;border:1px solid rgba(212,175,55,0.3);border-radius:15px;padding:30px;width:420px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+        <button onclick="document.getElementById('courtModal').style.display='none'" style="position:absolute;top:15px;right:15px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.2rem;cursor:pointer;">&times;</button>
+        <h2 style="color:#D4AF37;font-family:'Playfair Display',serif;text-align:center;margin-bottom:6px;">🏛 Assign Court to Case</h2>
+        <p id="courtModalCaseLabel" style="text-align:center;color:rgba(255,255,255,0.5);font-size:0.82rem;margin-bottom:20px;"></p>
+        <form onsubmit="submitCourtAssignment(event)">
+            <input type="hidden" id="courtCaseId">
+            <label style="color:#D4AF37;font-size:0.78rem;display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Select Court</label>
+            <select id="courtSelect" required style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:11px;color:#fff;font-family:'Poppins',sans-serif;outline:none;margin-bottom:18px;">
+                <option value="">— Choose a court —</option>
+                {% for court in courts %}
+                <option value="{{ court.court_id }}">{{ court.court_name }} — {{ court.city }}, {{ court.state }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" style="width:100%;background:#D4AF37;color:#000;font-weight:600;padding:12px;border:none;border-radius:8px;cursor:pointer;font-family:'Poppins',sans-serif;">Assign Court</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function filterCases() {
+    const q = document.getElementById('caseSearch').value.toLowerCase();
+    const rows = document.querySelectorAll('#caseBody tr');
+    let visible = 0;
+    rows.forEach(row => {
+        const show = row.innerText.toLowerCase().includes(q);
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+    document.getElementById('noCaseResult').style.display = visible === 0 ? 'block' : 'none';
+}
+
+function openCourtModal(caseId, caseNumber) {
+    document.getElementById('courtCaseId').value = caseId;
+    document.getElementById('courtModalCaseLabel').textContent = 'Case: ' + caseNumber;
+    document.getElementById('courtModal').style.display = 'flex';
+}
+
+async function submitCourtAssignment(e) {
+    e.preventDefault();
+    const caseId = document.getElementById('courtCaseId').value;
+    const courtId = document.getElementById('courtSelect').value;
+    if (!courtId) { alert('Please select a court.'); return; }
+    const fd = new FormData();
+    fd.append('court_id', courtId);
+    try {
+        const res = await fetch('/api/case/' + caseId + '/assign_court', { method:'POST', body: fd });
+        const r = await res.json();
+        if (r.success) location.reload();
+        else alert('Error: ' + (r.error || 'Unknown'));
+    } catch(e) { alert('Network error.'); }
+}
+
+async function deleteRecord(type, id) {
+    if (!confirm(`Are you sure you want to delete this ${type}? This action cannot be undone.`)) return;
+    try {
+        const res = await fetch(`/api/delete/${type}/${id}`, { method:'POST', headers:{'Content-Type':'application/json'} });
+        const r = await res.json();
+        if (r.success) location.reload();
+        else alert('Error: ' + (r.error || 'Unknown'));
+    } catch(e) { alert('An error occurred.'); }
+}
+</script>
+
+{% include 'buttons/shared/update_modal.html' %}
+</body>
+</html>
